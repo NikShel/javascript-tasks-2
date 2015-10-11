@@ -1,34 +1,59 @@
 'use strict';
 
-var phoneBook; // Здесь вы храните записи как хотите
+var phoneBook = [];
 
-/*
-   Функция добавления записи в телефонную книгу.
-   На вход может прийти что угодно, будьте осторожны.
-*/
+var EMAIL_RE = new RegExp('^[a-zа-я0-9]+@[a-zа-я0-9\\-]+(?:\\.[a-zа-я0-9\\-]+)+$');
+var PHONE_RE = new RegExp('^\\+{0,1}\\d*?(?:\\(\\d{3}\\)|\\d{3})(?:\\d{7}|\\d{3}-\\d-\\d{3})$');
+
+
+function findMatching(query) {
+    var matchingContacts = [];
+    var contact;
+    for (var i = 0; i < phoneBook.length; i++) {
+        contact = phoneBook[i];
+        if (contact[0].indexOf(query) >= 0 ||
+            contact[1].indexOf(query) >= 0 ||
+            contact[2].indexOf(query) >= 0) {
+
+            matchingContacts.push(contact);
+        }
+    }
+    return matchingContacts;
+}
+
+
 module.exports.add = function add(name, phone, email) {
+    phone = phone.replace(/\s+/g, '');
+    if (name !== '' &&
+        phone.match(PHONE_RE) !== null &&
+        email.match(EMAIL_RE) !== null) {
 
-    // Ваша невероятная магия здесь
-
+        phoneBook.push([name, phone, email]);
+    }
 };
 
-/*
-   Функция поиска записи в телефонную книгу.
-   Поиск ведется по всем полям.
-*/
+
 module.exports.find = function find(query) {
-
-    // Ваша удивительная магия здесь
-
+    var matching;
+    if (query) {
+        matching = findMatching(query);
+    } else {
+        matching = phoneBook;
+    }
+    var contact;
+    for (var i = 0; i < matching.length; i++) {
+        contact = matching[i];
+        console.log(contact.join(', '));
+    }
 };
 
-/*
-   Функция удаления записи в телефонной книге.
-*/
+
 module.exports.remove = function remove(query) {
-
-    // Ваша необьяснимая магия здесь
-
+    var matching = findMatching(query);
+    for (var i = 0; i < matching.length; i++) {
+        phoneBook.splice(phoneBook.indexOf(matching[i]), 1);
+    }
+    console.log('Контактов удалено:' + matching.length);
 };
 
 /*
