@@ -2,18 +2,19 @@
 
 var phoneBook = [];
 
-var EMAIL_RE = new RegExp('^[a-zа-я0-9]+@[a-zа-я0-9\\-]+(?:\\.[a-zа-я0-9\\-]+)+$');
-var PHONE_RE = new RegExp('^\\+{0,1}\\d*?(?:\\(\\d{3}\\)|\\d{3})(?:\\d{7}|\\d{3}-\\d-\\d{3})$');
+var EMAIL_RE = /^[\wа-я]+@[\wа-я\-]+(?:\.[\wа-я\-]+)+$/;
+var PHONE_RE = /^\+?\d*?(?:\(\d{3}\)|\d{3})(?:\d{7}|\d{3}-\d-\d{3})$/;
 
 
 function findMatching(query) {
+    query = query.toLocaleLowerCase();
     var matchingContacts = [];
     var contact;
     for (var i = 0; i < phoneBook.length; i++) {
         contact = phoneBook[i];
-        if (contact[0].indexOf(query) >= 0 ||
-            contact[1].indexOf(query) >= 0 ||
-            contact[2].indexOf(query) >= 0) {
+        if (contact[0].toLocaleLowerCase().indexOf(query) >= 0 ||
+            contact[1].toLocaleLowerCase().indexOf(query) >= 0 ||
+            contact[2].toLocaleLowerCase().indexOf(query) >= 0) {
 
             matchingContacts.push(contact);
         }
@@ -22,11 +23,15 @@ function findMatching(query) {
 }
 
 
+function removeSpaces(string) {
+    return string.replace(/\s+/g, '');
+}
+
+
 module.exports.add = function add(name, phone, email) {
-    phone = phone.replace(/\s+/g, '');
     if (name !== '' &&
-        phone.match(PHONE_RE) !== null &&
-        email.match(EMAIL_RE) !== null) {
+        PHONE_RE.test(removeSpaces(phone)) &&
+        EMAIL_RE.test(removeSpaces(email))) {
 
         phoneBook.push([name, phone, email]);
     }
